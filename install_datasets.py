@@ -1,12 +1,11 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Literal
 
 import kagglehub
 
 
-__all__ = ["download_datasets"]
+__all__ = ["download_dataset"]
 
 
 def is_colab():
@@ -16,7 +15,7 @@ def is_colab():
     except ImportError:
         return False
 
-def delete_donwload_cache(download_path: str, dataset: Literal["Set5", "DIV2K"]) -> None:
+def delete_donwload_cache(download_path: str, dataset_owner: str) -> None:
     """
     Delete the cache donwload directory.
     """
@@ -25,37 +24,20 @@ def delete_donwload_cache(download_path: str, dataset: Literal["Set5", "DIV2K"])
     while count <= len(delete_dir.parts):
         delete_dir = delete_dir.parent
         count += 1
-        if dataset == "Set5" and delete_dir.name == "ll01dm":
-            print("Deleting cache directory for Set5 download")
-            shutil.rmtree(delete_dir)
-            break
-        elif dataset == "DIV2K" and delete_dir.name == "joe1995":
-            print("Deleting cache directory for DIV2K download")
+        if delete_dir.name == dataset_owner:
+            print("Deleting original download directory for dataset")
             shutil.rmtree(delete_dir)
             break
 
-def download_dataset(dataset: Literal["Set5", "DIV2K"]) -> None:
+def download_dataset(dataset: str) -> None:
     """
     Download a dataset from Kaggle.
     """
-    if dataset != "Set5" and dataset!= "DIV2K":
-        raise ValueError("dataset must be 'Set5' or 'DIV2K'")
-    print(f"📥 Descargando dataset: {dataset}...")
-    download_path = None
-    if dataset == "Set5":
-        download_path = kagglehub.dataset_download("ll01dm/set-5-14-super-resolution-dataset", force_download=True)
-        dataset_paths = Path(download_path) / dataset / dataset
-        dst_path = Path(os.getcwd()) / dataset
-        shutil.copytree(dataset_paths, dst_path, dirs_exist_ok=True)
-    elif dataset == "DIV2K":
-        download_path = kagglehub.dataset_download("joe1995/div2k-dataset", force_download=True)
-        for subdir in ["DIV2K_train_HR", "DIV2K_valid_HR"]:
-            dataset_path = Path(download_path) / subdir / subdir
-            dst_path = Path(os.getcwd()) / dataset / subdir
-            shutil.copytree(dataset_path, dst_path, dirs_exist_ok=True)
+    dataset_owner = dataset.split("/", 1)[0]
+    dataset_name = dataset.split("/", 1)[1]
+    print(f"📥 Descargando dataset: {dataset_name} ...")
+    download_path = kagglehub.dataset_download(dataset, force_download=True)
+    dst_path = Path(os.getcwd()) / dataset
+    shutil.copytree(download_path, dst_path, dirs_exist_ok=True)
     if not is_colab():
-      delete_donwload_cache(download_path, dataset)
-
-def download_datasets():
-  download_dataset("Set5")
-  download_dataset("DIV2K")
+      delete_donwload_cache(download_path, dataset_owner)
