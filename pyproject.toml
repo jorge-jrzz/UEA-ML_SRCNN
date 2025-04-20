@@ -7,11 +7,8 @@ requires-python = ">=3.11"
 dependencies = [
     "ipykernel>=6.29.5",
     "kagglehub>=0.3.11",
+    "keras>=3.9.2",
     "matplotlib>=3.10.1",
-    "numpy>=2.2.4",
-    "opencv-python>=4.11.0.86",
     "pillow>=11.2.1",
-    "scikit-image>=0.25.2",
-    "torch>=2.6.0",
-    "torchvision>=0.21.0",
+    "tensorflow>=2.19.0",
 ]
