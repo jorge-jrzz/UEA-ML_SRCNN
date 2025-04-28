@@ -2,4 +2,5 @@ kagglehub
 keras
 matplotlib
 pillow
+scikit-image
 tensorflow
